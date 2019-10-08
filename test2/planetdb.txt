@@ -1,0 +1,1 @@
+{"nome":"Marte","clima":"Quente","terreno":"Arenoso"}
