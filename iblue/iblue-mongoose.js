@@ -1,6 +1,6 @@
 const db = require('mongoose');
 const url = require('./credentials.js'); 
-
+const validator = require('validator')
 db.connect(url,{
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -18,31 +18,36 @@ const Planets = db.model('Planets',{
     }
 },'Planets')
     
-function createPlanet (argName,argCli,argLand){
+function createPlanet (array,callback){
                 const Planet = new Planets({
-                    name:argName,
-                    climate:argCli,
-                    land:argLand
+                    name:array['name'],
+                    climate:array['climate'],
+                    land:array['land']
                 });
 
                 Planet.save()
                 .then((result)=>{
-                   return "Planet created"
+                   callback(true)
                 })
                 .catch((error) => {
+                    callback(false)
                     console.log("Document not saved!\nError nessage"+error)
                 } 
 
                 );
 }
-function findPlanet (argName,argCli,argLand){
+function findPlanet (data,callback){
     Planets.findOne({
-        'name':argName,
+        'name':data['name'],
     },(err,result)=>{
-        if (err) throw Error (err)
-        console.log("\n\tPlanet information:\n\tID:"+result.id+"\n\tName:"+result.name+"\n\tClimate:"+result.climate+"\n\tLand:"+result.land)
+        if (err) {
+            callback(false)
+            throw Error (err)
+        }
+        else{
+            callback(result)
+        }
     })
-
 }
 
 module.exports = {createPlanet,findPlanet}

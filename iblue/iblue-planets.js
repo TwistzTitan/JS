@@ -1,16 +1,15 @@
 const yargs = require ('yargs')
 const chalk = require('chalk')
-const iblmgdb = require('./iblue-mongoose.js')
+const validator = require('validator')
+const request = require ('request')  
 
-//yargs.usage("$0 \n\n create [args]\n\n$0 update [args]\n\n$0 remove [args]\n\n$0 find [args]",
-//chalk.blue.bold("Commands to manage planets "))
 yargs
-    .command("create",false,
+    .command("create",chalk.blue.bold('Command to create planets'),{},
             ()=> {
                 yargs
                 .command({
                     command:"planet",
-                    describe: chalk.blue.bold('\nCommand to create planets'),
+                    describe: chalk.blue.bold('Define planet parameters'),
                     builder:{
                         name:{
                             describe:'Name of a planet',
@@ -28,24 +27,24 @@ yargs
                             type:String,
                         }
                     },
-                    handler:()=>{
-                        console.log(iblmgdb.createPlanet(yargs.argv.name,yargs.argv.climate,yargs.argv.land))
-                    }}
+                    handler: async ()=>{}
+
+                    }
                 ).number(['climate'])
                 .demandOption(['name','climate','land'])
-                .demandCommand(1,"Insert create command before")
+                .demandCommand(1,"Insert create command before").argv
+                
             }
     )
-    .help()
-    .choices(['planet']).argv;
+    .choices(['planet']).argv
 
     yargs
-    .command("find",false,
+    .command("find",chalk.blue.bold('Command to find planets'),{},
             ()=> {
                 yargs
                 .command({
                     command:"planet",
-                    describe: chalk.green.bold('\nCommand to find planets'),
+                    describe: chalk.blue.bold('Define planet parameters'),
                     builder:{
                         name:{
                             describe:'Name of a planet',
@@ -60,26 +59,30 @@ yargs
                             type:String,
                         }
                     },
-                    handler:()=>{
-                        setTimeout(()=>{
-                            iblmgdb.findPlanet(yargs.argv.name,null,null);
-                        },2000); 
-                    }}
+                    handler:async ()=>{
+                        request({url:"http://localhost:9080/find?name="+yargs.argv.name,json:true},(err,resp,body)=>{
+                            console.log(err)
+                            console.log(resp.statusCode)
+                            console.log(body)
+                        })
+                    }
+                      
+                    }
                 )
                 .demandCommand(1,"Insert find command before")
                 .demandOption(['name'])
             }
     )
-    .help()
-    .choices(['planet']).argv;
+    .choices(['planet'])
+    .argv
 
     yargs
-    .command("remove",false,
+    .command("remove",chalk.blue.bold('Command to remove planets'),{},
             ()=> {
                 yargs
                 .command({
                     command:"planet",
-                    describe: chalk.red.bold('\nCommand to remove planets'),
+                    describe: chalk.blue.bold('Define planets parameters'),
                     builder:{
                         name:{
                             describe:'Name of a planet',
@@ -95,16 +98,15 @@ yargs
                 .demandCommand(1,"Insert remove command before")
             }
     )
-    .help()
     .choices(['planet']).argv;
 
     yargs
-    .command("update",false,
+    .command("update",chalk.blue.bold('Command to update planets'),{},
             ()=> {
                 yargs
                 .command({
                     command:"planet",
-                    describe: chalk.blue.bold('\nCommand to upadate planets'),
+                    describe: chalk.blue.bold('Define planets parameters'),
                     builder:{
                         name:{
                             describe:'Name of a planet',
@@ -129,6 +131,11 @@ yargs
                 .demandCommand(1,"Insert update command before")
             }
     )
-    .help()
     .choices(['planet']).argv
-    yargs.parse()
+    
+
+    if (yargs.argv._ == "")
+        yargs.showHelp();
+    
+    yargs.exit(1)
+    
