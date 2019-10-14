@@ -2,6 +2,7 @@ const yargs = require ('yargs')
 const chalk = require('chalk')
 const validator = require('validator')
 const request = require ('request')  
+const {findPlanet} = require('./iblue-client.js')
 
 yargs
     .command("create",chalk.blue.bold('Command to create planets'),{},
@@ -27,7 +28,11 @@ yargs
                             type:String,
                         }
                     },
-                    handler: async ()=>{}
+                    handler: async ()=>{
+                        findPlanet({"name":yargs.argv.name},(err,body)=>{
+                            console.log(body)
+                        })
+                    }
 
                     }
                 ).number(['climate'])
@@ -60,12 +65,9 @@ yargs
                         }
                     },
                     handler:async ()=>{
-                        request({url:"http://localhost:9080/find?name="+yargs.argv.name,json:true},(err,resp,body)=>{
-                            console.log(err)
-                            console.log(resp.statusCode)
-                            console.log(body)
-                        })
-                    }
+
+
+                    } 
                       
                     }
                 )
