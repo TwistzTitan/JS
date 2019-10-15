@@ -5,7 +5,9 @@ function createPlanet (array,callback){
         name:array['name'],
         climate:array['climate'],
         land:array['land']
-    });
+    }).catch((err)=>{
+        callback(err)
+    })
 
     Planet.save()
     .then((result)=>{
@@ -13,9 +15,8 @@ function createPlanet (array,callback){
     })
     .catch((error) => {
         callback(error)
-    } 
-
-    );
+    }) 
+    
 }
 
 
@@ -31,4 +32,23 @@ function findPlanet (data,callback){
         }
     })
 }
-module.exports = {createPlanet,findPlanet}
+
+function updatePlanet (data,callback){
+    Planets.update({'name':data['name'],'climate':data['climate'],'land':data['land']},
+                   {'name':data['nName'],'climate':data['nClimate'],'land':data['nLand']},
+        {omitUndefined:true},(err,response)=>{
+            if(err){
+                callback(err)
+            }
+            else{
+                callback(response)
+            }
+        })
+}
+
+function removePlanet(data,callback){
+    Planets.deleteOne({'name':data['name'],'climate':data['climate'],'land':data['land']},(res,count)=> return callback(res,count))
+    .catch((err)=>callback(err))
+}
+
+module.exports = {createPlanet,findPlanet,removePlanet,updatePlanet}

@@ -2,7 +2,7 @@ const {join} = require('path')
 const express = require('express'); 
 const app = express();
 const port = process.env.port || 9080;
-const {createPlanet,findPlanet} = require('./iblue-mgdb-ops.js')
+const {createPlanet,findPlanet,removePlanet,updatePlanet} = require('./iblue-mgdb-ops.js')
 const publicDir = join(__dirname,'../public')
 
 app.set('view engine','hbs')
@@ -38,9 +38,23 @@ app.post('/form-find',(req,res)=> {
 })
 app.post('/create',(req,res)=>{
     const body = req.body 
-    createPlanet(body,(result)=>{
-        result !== null ? res.json(result).status(200) : res.status(404)
+    createPlanet(body,(err,result)=>{
+        if(err){
+            res.status(406).send("Try again validation error")
+        }
+        res.json(result).status(200)
     })
+})
+app.delete('/delete',(req,res)=>{
+    const body = req.body
+    removePlanet(body,callback(res,count)=>{
+        res.status(202).send("Deleted: "+count+" docs")
+    })
+    .catch((err)=>{
+        res.status(404).send(200)
+    })
+
+
 })
 app.listen(port,function (){
     console.log('App running at port: '+port)
