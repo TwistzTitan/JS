@@ -5,19 +5,17 @@ const Planets = db.model('Planets',{
     name:{
         type: String,
         required:true,
-        unique:true,
         minlength:1,
         maxlength:15,
         validate:{
-        	validator: async(v)=>{
+        	validator: (v)=>{
         		if(validation.isEmpty(v)){
-
-        			reject(false)
+                    return false
         		}
         		if(validation.isJSON(v)){
-        			reject(false)
+        			return false
         		}
-        		resolve(true)
+        		    return true
         	}
         }
 
@@ -27,18 +25,18 @@ const Planets = db.model('Planets',{
         required:true,
         minlength:1,
         maxlength:15,
-        validator:()=> {
+        //validator:()=> {
 
-        }
+        //}
     },
     land:{
         type: String,
         required:true,
         minlength:1,
         maxlength:15,
-        validator:()=>{
+        //validator:()=>{
 
-        }
+        //}
     }
 },'Planets')
 

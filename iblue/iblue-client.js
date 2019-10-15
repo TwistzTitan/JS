@@ -1,36 +1,77 @@
-const request = require('request')
-const validator = require('validator');
-const cred = require ('./credentials.js'); 
+const axios = require('axios')
 
-// GET methods 
+// POST METHODS
 
-const findPlanet = (data,callback)=> {
-    console.log(data)
-        request.post({url:'http://localhost:9080/find', form:{name:data['name']}},(err,resp,body)=>{
-                if(body !== null ){ 
-                console.log(body)
-                callback(body)
-                }
-            }
-        )
+const listPlanet = async (data,callback) => {
+    try{
+        const result  = await axios.post('http://localhost:9080/list',{'name':data})
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
 }
 
-// POST methods 
-
-const createPlanet = (data)=> {
-
-    request({url:"http://localhost:9080/create",json:true},(err,resp,body)=>{
-                           console.log(err)
-                           console.log(resp.statusCode)
-                           console.log(body)
-   })
+const findPlanet = async (data,callback) => {
+    try{
+        const result  = await axios.post('http://localhost:9080/find',{'name':data})
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
 }
 
-// DELETE methods 
+const createPlanet = async (data,callback) => {
+    try{
+        const result  = await axios.post('http://localhost:9080/create',{'name':data.name,'climate':data.climate,'land':data.land})
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
+}
 
 
-// PATCH methods (update planets)
+
+//DELETE METHODS
+
+const deletePlanet = async (arg,callback) => {
+    try{
+        const result  = await axios.delete('http://localhost:9080/delete',{data:{'name': arg}})
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
+}
 
 
 
-module.exports = {findPlanet}
+// UPDATE METHODS
+
+const updatePlanet = async (data,callback) => {
+    try{
+        const result  = await axios.patch('http://localhost:9080/update/'+data.planet+'',{'name':data.name,'climate':data.climate,'land':data.land})
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
+}
+
+// GET METHODS
+
+const findPlanetByID = async (data,callback) => {
+    try{
+        const result  = await axios.get('http://localhost:9080/find/'+data)
+        callback(undefined,result)
+    }   
+    catch(err){
+        callback(err,undefined)
+    }
+}
+
+
+
+module.exports = {findPlanet,listPlanet,createPlanet,deletePlanet,updatePlanet,findPlanetByID}

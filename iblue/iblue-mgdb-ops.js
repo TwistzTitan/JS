@@ -5,24 +5,23 @@ function createPlanet (array,callback){
         name:array['name'],
         climate:array['climate'],
         land:array['land']
-    }).catch((err)=>{
-        callback(err)
     })
 
-    Planet.save()
-    .then((result)=>{
-       callback(result)
-    })
-    .catch((error) => {
-        callback(error)
-    }) 
-    
+    if (Planet){
+        Planet.save()
+        .then((result)=>{
+        callback(undefined,result)
+        })
+        .catch((error) => {
+            callback(error,undefined)
+        }) 
+    }
 }
 
 
 function findPlanet (data,callback){
     Planets.findOne({
-        'name':data['name'],
+        'name':data['name']
     },(err,result)=>{
         if (err) {
             callback(err)
@@ -33,22 +32,51 @@ function findPlanet (data,callback){
     })
 }
 
+function findPlanetByID (data,callback){
+    Planets.findById({
+        '_id':data
+    },(err,result)=>{
+        if (err) {
+            callback(err)
+        }
+        else{
+            callback(result)
+        }
+    })
+}
+
+function listPlanet (data,callback){
+    Planets.find({
+        'name':data['name']
+    },(err,result)=>{
+        if (err) {
+            callback(err)
+        }
+        else{
+            callback(result)
+        }
+    })
+}
+
+
 function updatePlanet (data,callback){
-    Planets.update({'name':data['name'],'climate':data['climate'],'land':data['land']},
-                   {'name':data['nName'],'climate':data['nClimate'],'land':data['nLand']},
+    Planets.updateOne({name:data[0].name},
+                   {$set:{name:data[1].name,climate:data[1].climate,land:data[1].land}},
         {omitUndefined:true},(err,response)=>{
             if(err){
-                callback(err)
+                callback(err,undefined)
             }
             else{
-                callback(response)
+                callback(undefined,response)
             }
         })
 }
 
 function removePlanet(data,callback){
-    Planets.deleteOne({'name':data['name'],'climate':data['climate'],'land':data['land']},(res,count)=> return callback(res,count))
+    Planets.deleteOne({name:data['name']})
+    .then((res)=>{
+        callback(res)})
     .catch((err)=>callback(err))
 }
 
-module.exports = {createPlanet,findPlanet,removePlanet,updatePlanet}
+module.exports = {createPlanet,findPlanet,removePlanet,updatePlanet,listPlanet,findPlanetByID}

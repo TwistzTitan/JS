@@ -1,143 +1,160 @@
+#!/usr/bin/env node
 const yargs = require ('yargs')
 const chalk = require('chalk')
 const validator = require('validator')
-const request = require ('request')  
-const {findPlanet} = require('./iblue-client.js')
+const {findPlanet, listPlanet, createPlanet, deletePlanet, updatePlanet,findPlanetByID} = require('./iblue-client.js')
 
-yargs
-    .command("create",chalk.blue.bold('Command to create planets'),{},
-            ()=> {
-                yargs
-                .command({
-                    command:"planet",
-                    describe: chalk.blue.bold('Define planet parameters'),
-                    builder:{
+
+yargs.command('create',chalk.blue.bold('Command to create planets'),
+                {            
+                    name:{
+                        describe:'Name of a planet',
+                        demandOption:true,
+                        type:String,
+                    },
+                    climate:{
+                        describe:'Climate of a planet',
+                        demandOption:true,
+                        type:Number,
+                    },
+                    land:{
+                        describe:'Land of a planet',
+                        demandOption:true,
+                        type:String,
+                    }
+                },
+                async ()=>
+                {
+                    createPlanet(yargs.argv,(err,result)=> { 
+                        if(err)console.log("Error to create file")
+                        else{
+                            console.log("\n\tID :"+result.data._id+"\n\tClimate :"+result.data.climate+"\n\tLand :"+result.data.land+"\n")
+                        }
+                    })
+                }
+            
+            )
+    .command('find',chalk.blue.bold('Command to find planets'),
+                {
+                    
                         name:{
-                            describe:'Name of a planet',
+                            describe:"Name of planet",
                             demandOption:true,
-                            type:String,
+                            demandCommand:(1,'Insert <comand> find'),
+                            type:String
+                            
                         },
                         climate:{
-                            describe:'Climate of a planet',
-                            demandOption:true,
-                            type:Number,
+                            describe:"Climate of planet",
+                            demandCommand:(1,'Insert <comand> find'),
+                            type:String
                         },
                         land:{
-                            describe:'Land of a planet',
-                            demandOption:true,
+                            describe:"Land of planet",
+                            demandCommand:(1,'Insert <comand> find'),
+                            type:String
+                        },
+                        list:{
+                            describe:"Option to list planets",
+                            demandCommand:(1,'Insert <comand> find'),
+                            type:Boolean
+                        },
+                        id:{
+                            describe:"ID of planet",
+                            demandCommand:(1,'Insert <comand> find'),
                             type:String,
                         }
-                    },
-                    handler: async ()=>{
-                        findPlanet({"name":yargs.argv.name},(err,body)=>{
-                            console.log(body)
+                    
+                },
+                async ()=>{
+                    if (yargs.argv.list){
+                        listPlanet(yargs.argv.name,(err,result)=>{
+                            if (err) console.log("Error on list")
+                            else{
+                            result.data.forEach(element => {
+                                console.log("\n\tID :"+element._id+"\n\tClimate :"+element.climate+"\n\tLand :"+element.land+"\n")
+                            });
+                            }
+                            
                         })
                     }
-
+                    else{
+                        if(yargs.argv.id){
+                            
+                            findPlanetByID(yargs.argv.id,(err,result)=>{
+                                if(err)console.log('\n\tPlanet not find\n')
+                                else{
+                                    console.log("\n\tID :"+result.data._id+"\n\tClimate :"+result.data.climate+"\n\tLand :"+result.data.land+"\n")
+                                }
+                            })
+                        }
+                        else{
+                            findPlanet(yargs.argv.name,(err,result)=>{
+                                if(err)console.log('\n\tPlanet not find\n')
+                                else{
+                                    console.log("\n\tID :"+result.data._id+"\n\tClimate :"+result.data.climate+"\n\tLand :"+result.data.land+"\n")
+                                }
+                            })
+                        }
                     }
-                ).number(['climate'])
-                .demandOption(['name','climate','land'])
-                .demandCommand(1,"Insert create command before").argv
+                   
+    })
+    .command("delete",chalk.blue.bold('Command to update planets'),
+                    {            
+                        name:{
+                            describe:'Name of a planet',
+                            demandOption:true,
+                            type:String,
+                        }
+                    },
+                    async ()=>
+                    {   
+                        deletePlanet(yargs.argv.name,(err,result)=> { 
+                            if(err)console.log("Error to delete file")
+                            else{
+                                console.log("\n\tPlanet deleted :"+result.data.deleteCount)
+                            }
+                        })
+                    }
                 
-            }
-    )
-    .choices(['planet']).argv
-
-    yargs
-    .command("find",chalk.blue.bold('Command to find planets'),{},
-            ()=> {
-                yargs
-                .command({
-                    command:"planet",
-                    describe: chalk.blue.bold('Define planet parameters'),
-                    builder:{
-                        name:{
-                            describe:'Name of a planet',
-                            type:String,
-                        },
-                        climate:{
-                            describe:'Climate of a planet',
-                            type:Number,
-                        },
-                        land:{
-                            describe:'Land of a planet',
-                            type:String,
-                        }
+                )
+    .command('update',chalk.blue.bold('Command to update planets'),
+                {            
+                    planet:{
+                        describe:'Name of the planet to be updated',
+                        demandOption:true,
+                        type:String,
                     },
-                    handler:async ()=>{
-
-
-                    } 
-                      
+                    
+                    name:{
+                        describe:'New name of the planet',
+                        type:String,
+                    },
+                    climate:{
+                        describe:'New climate of a planet',
+                        type:Number,
+                    },
+                    land:{
+                        describe:'New land of a planet',
+                        type:String,
                     }
-                )
-                .demandCommand(1,"Insert find command before")
-                .demandOption(['name'])
-            }
-    )
-    .choices(['planet'])
-    .argv
-
-    yargs
-    .command("remove",chalk.blue.bold('Command to remove planets'),{},
-            ()=> {
-                yargs
-                .command({
-                    command:"planet",
-                    describe: chalk.blue.bold('Define planets parameters'),
-                    builder:{
-                        name:{
-                            describe:'Name of a planet',
-                            type:String,
-                            demandOption:true,
-                        },
-                       
-                    },
-                    handler:()=>{
-
-                    }}
-                )
-                .demandCommand(1,"Insert remove command before")
-            }
-    )
-    .choices(['planet']).argv;
-
-    yargs
-    .command("update",chalk.blue.bold('Command to update planets'),{},
-            ()=> {
-                yargs
-                .command({
-                    command:"planet",
-                    describe: chalk.blue.bold('Define planets parameters'),
-                    builder:{
-                        name:{
-                            describe:'Name of a planet',
-                            demandOption:true,
-                            type:String,
-                        },
-                        climate:{
-                            describe:'Climate of a planet',
-                            demandOption:true,
-                            type:Number,
-                        },
-                        land:{
-                            describe:'Land of a planet',
-                            demandOption:true,
-                            type:String,
+                },
+                async ()=>
+                {
+                    updatePlanet(yargs.argv,(err,result)=> { 
+                        if(err)console.log("Error to update planet")
+                        else{
+                            console.log("\n\tPlanet updated :"+result.data.n+"\n")
                         }
-                    },
-                    handler:()=>{
-                        
-                    }}
-                )
-                .demandCommand(1,"Insert update command before")
-            }
-    )
-    .choices(['planet']).argv
-    
+                    })
+                }
+            
+            )
+            .argv
 
     if (yargs.argv._ == "")
         yargs.showHelp();
     
-    yargs.exit(1)
+   // result.dataxit(result.data
     
+   // resul
