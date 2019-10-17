@@ -47,7 +47,6 @@ function findPlanetByID (data,callback){
 
 function listPlanet (data,callback){
     Planets.find({
-        'name':data['name']
     },(err,result)=>{
         if (err) {
             callback(err)
