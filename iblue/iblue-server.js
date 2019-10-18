@@ -1,11 +1,13 @@
 const {join} = require('path')
 const express = require('express'); 
 const app = express();
+const cors = require('cors')
 const port = process.env.port || 9080;
 const {createPlanet,findPlanet,removePlanet,updatePlanet,listPlanet,findPlanetByID} = require('./iblue-mgdb-ops.js')
 const publicDir = join(__dirname,'../public')
 
 app.set('view engine','hbs')
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(publicDir))
@@ -17,10 +19,12 @@ app.get('/search',(req,res)=>{
 app.get('/find',(req,res)=>{
     const data = {"name":req.query.name,"climate":req.query.climate,"land":req.query.land};
         findPlanet(data,(result)=>{
-            res.render('find',{FindArray:[result.name,result.climate,result.land]})
+            //res.render('find',{FindArray:[result.name,result.climate,result.land]
+            result !== null ? res.json(result).status(200) : res.status(404).json(result)
         })
     
-}).post('/find',(req,res)=> {
+})
+app.post('/find',(req,res)=> {
     const data = {"name":req.body.name,"climate":req.body.climate,"land":req.body.land};
     findPlanet(data,(result)=>{
         result !== null ? res.json(result).status(200) : res.status(404).json(result)
