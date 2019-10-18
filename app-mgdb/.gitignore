@@ -1,0 +1,11 @@
+# Ignorar node modules
+node_modules/*
+# package-lock.json
+*-lock.json
+<<<<<<< HEAD
+credentials.js
+
+=======
+# credentials.js 
+*credentials.js
+>>>>>>> a5e6d05... test
