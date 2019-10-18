@@ -47,7 +47,6 @@ function findPlanetByID (data,callback){
 
 function listPlanet (data,callback){
     Planets.find({
-        'name':data['name']
     },(err,result)=>{
         if (err) {
             callback(err)
@@ -61,8 +60,7 @@ function listPlanet (data,callback){
 
 function updatePlanet (data,callback){
     Planets.updateOne({name:data[0].name},
-                   {$set:{name:data[1].name,climate:data[1].climate,land:data[1].land}},
-        {omitUndefined:true},(err,response)=>{
+                   {$set:{name:data[1].name,climate:data[1].climate,land:data[1].land}},(err,response)=>{
             if(err){
                 callback(err,undefined)
             }
