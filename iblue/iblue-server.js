@@ -12,9 +12,6 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(publicDir))
 
-app.get('/search',(req,res)=>{
-    res.render('search')
-})
 
 app.get('/find',(req,res)=>{
     const data = {"name":req.query.name,"climate":req.query.climate,"land":req.query.land};
